@@ -15,12 +15,15 @@ admin.initializeApp({
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  
+  app.enableCors();
+  
   try {
     await app.listen(process.env.PORT, () => {
-      console.log(`🚀✔ Server is running ${process.env.PORT}`)
+      console.log(`🚀✔ Server is running ${process.env.PORT}`);
     });
   } catch (error){
-    console.log(`❌ Server is not running : ${error}`)
+    console.log(`❌ Server is not running : ${error}`);
   }
 }
 bootstrap();

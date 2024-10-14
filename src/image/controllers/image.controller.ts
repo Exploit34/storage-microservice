@@ -3,7 +3,7 @@ import { ImageService } from '../services/image.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Image } from '../entities/image.entity';
 import { CreateImageDto } from '../dto/create-image.dto';
-import { ValidateId } from 'src/validations/image/image.validation';
+import { ValidateId } from 'src/middleware/image/image.validation';
 
 @Controller('images')
 export class ImageController {
@@ -12,18 +12,21 @@ export class ImageController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() createImageDto: CreateImageDto): Promise<Image> {
-    console.log(`Uploaded file:`, file);
-
+    console.log(`Uploaded file: ${file}`);
+  
     if (!file) {
+      console.error('No file uploaded or file is undefined');
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     }
+  
     try {
       return await this.imageService.uploadImage(file, createImageDto);
     } catch (error) {
-      console.error('Error uploading image:', error);
-      throw new HttpException('Error uploading image', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error('Error during uploadImage:', error);
+      throw new HttpException('Error during image upload', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+  
 
   @Get('all')
   async getImages(): Promise<Image[]> {

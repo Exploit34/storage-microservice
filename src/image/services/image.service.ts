@@ -17,12 +17,13 @@ export class ImageService {
     }
   
     try {
-      // Crea un nuevo objeto de imagen
       const newImage = this.imageRepository.create({
         filename: file.filename,
         originalname: file.originalname,
         url: `uploads/${file.filename}`,
         description: createImageDto.description,
+        createdAt: Date(),
+        updatedAt: Date(),
       });
   
       return await this.imageRepository.save(newImage);

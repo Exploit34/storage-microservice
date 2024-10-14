@@ -13,7 +13,7 @@ import { firebaseSdk } from '../firebase/SDK/firebase.sdk';
     ImageModule,
   ],
   controllers: [AppController, HomeAppController],
-  providers: [AppService, HomeModule, ImageModule],
+  providers: [AppService],
 })
 export class AppModule {
   constructor() {
