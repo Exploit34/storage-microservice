@@ -6,10 +6,10 @@ dotenv.config();
 export const firebaseSdk = async () => {
     if(admin.apps.length === 0) {
         try {
-            const serviceAccount = await import('./storage-microservice-a51cf-firebase-adminsdk-ywuzd-706e21704f.json');
+            const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         
             admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount.default as ServiceAccount),
+                credential: admin.credential.cert(serviceAccount as ServiceAccount),
                 storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
             });
         } catch (error) {
