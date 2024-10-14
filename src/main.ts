@@ -7,15 +7,14 @@ import * as admin from 'firebase-admin';
 
 dotenv.config();
 
-admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-});
+// admin.initializeApp({
+//   credential: admin.credential.applicationDefault(),
+//   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+// });
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
-  
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors();
   
   try {

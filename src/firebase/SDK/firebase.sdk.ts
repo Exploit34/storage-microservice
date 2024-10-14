@@ -5,11 +5,15 @@ dotenv.config();
 
 export const firebaseSdk = async () => {
     if(admin.apps.length === 0) {
-        const serviceAccount = await import('./storage-microservice-a51cf-firebase-adminsdk-ywuzd-706e21704f.json');
+        try {
+            const serviceAccount = await import('./storage-microservice-a51cf-firebase-adminsdk-ywuzd-706e21704f.json');
         
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount as ServiceAccount),
-            storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-        });
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount.default as ServiceAccount),
+                storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            });
+        } catch (error) {
+            console.log(`Error loading Firebase credentials: ${error}`);
+        }
     }
-}
+};

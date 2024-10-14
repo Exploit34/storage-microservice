@@ -16,6 +16,9 @@ export class Image {
 
   @Column()
   description: string;
+  
+  @Column()
+  path: string;
 
   @Column({ name: 'createdAt' })
   createdAt: Date;

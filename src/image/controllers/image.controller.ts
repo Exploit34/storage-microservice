@@ -1,61 +1,33 @@
-import { Controller, Post, Get, Delete, Param, UploadedFile, UseInterceptors, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { ImageService } from '../services/image.service';
+import { Controller, Post, UploadedFile, UseInterceptors, Get, Param, Delete, Body, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Image } from '../entities/image.entity';
+import { ImageService } from '../services/image.service';
 import { CreateImageDto } from '../dto/create-image.dto';
-import { ValidateId } from 'src/middleware/image/image.validation';
+import { Image } from '../entities/image.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('images')
+@UseGuards(JwtAuthGuard)
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() createImageDto: CreateImageDto): Promise<Image> {
-    console.log(`Uploaded file: ${file}`);
-  
-    if (!file) {
-      console.error('No file uploaded or file is undefined');
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
-    }
-  
-    try {
-      return await this.imageService.uploadImage(file, createImageDto);
-    } catch (error) {
-      console.error('Error during uploadImage:', error);
-      throw new HttpException('Error during image upload', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.imageService.uploadImage(file, createImageDto);
   }
-  
 
   @Get('all')
   async getImages(): Promise<Image[]> {
-    return this.imageService.getImages();
+    return await this.imageService.getImages();
   }
 
   @Get(':id')
-  async getImageById(@Param('id', ValidateId) id: number): Promise<Image> {
-    const image = await this.imageService.getImageById(id);
-    if (!image) {
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
-    }
-    return image;
-  }
-
-  @Get('filename/:filename')
-  async getImageByFilename(@Param('filename') filename: string): Promise<Image> {
-    const image = await this.imageService.getImageByFilename(filename);
-    if (!image) {
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
-    }
-    return image;
+  async getImageById(@Param('id') id: number): Promise<Image | null> {
+    return await this.imageService.getImageById(id);
   }
 
   @Delete(':id')
-  async deleteImage(@Param('id', ValidateId) id: number): Promise<void> {
-    const result = await this.imageService.deleteImage(id);
-    if (!result) {
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
-    }
+  async deleteImage(@Param('id') id: number): Promise<boolean> {
+    return await this.imageService.deleteImage(id);
   }
 }
