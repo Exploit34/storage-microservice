@@ -17,10 +17,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   try {
     await app.listen(process.env.PORT, () => {
-      console.log(`Server is running ${process.env.PORT}`)
+      console.log(`🚀✔ Server is running ${process.env.PORT}`)
     });
   } catch (error){
-    console.log(`Server is not running : ${error}`)
+    console.log(`❌ Server is not running : ${error}`)
   }
 }
 bootstrap();

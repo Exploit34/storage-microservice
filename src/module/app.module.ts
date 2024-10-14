@@ -3,13 +3,20 @@ import { AppController, HomeAppController } from '../controllers/app.controller'
 import { AppService } from '../services/app.service';
 import { HomeModule } from '../interface/modules/module.home';
 import { DatabaseModule } from '../db/modules/database.module';
+import { ImageModule } from '../image/modules/image.module';
+import { firebaseSdk } from '../firebase/SDK/firebase.sdk';
 
 @Module({
   imports: [
     HomeModule,
     DatabaseModule,
+    ImageModule,
   ],
   controllers: [AppController, HomeAppController],
-  providers: [AppService, HomeModule],
+  providers: [AppService, HomeModule, ImageModule],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    firebaseSdk();
+  }
+}

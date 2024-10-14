@@ -1,47 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { Storage } from 'firebase-admin/storage';
 import * as admin from 'firebase-admin';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Image } from '../entities/image.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { storage } from '../../firebase/config/firebase.config';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 @Injectable()
 export class ImageService {
-  private storage = new Storage();
-  
   constructor(
     @InjectRepository(Image)
     private imageRepository: Repository<Image>,
-  ) {
-    this.storage = admin.storage();
-  }
+  ) {}
 
   async uploadImage(file: Express.Multer.File): Promise<Image> {
-    const imageRef = ref(storage, file.originalname);
-    const bucket = this.storage.bucket();
-    const fileName = `${uuidv4()}-${file.originalname}`;
-    const fileUpload = bucket.file(fileName);
-
-    await uploadBytes(imageRef, file.buffer);
-
-    const imageUrl = await getDownloadURL(imageRef);
-
-    const image = this.imageRepository.create({
-      url: imageUrl,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await this.imageRepository.save(image);
-
-    await fileUpload.save(file.buffer, {
-      metadata: { contentType: file.mimetype },
-    });
-
-    return image;
+    try {
+      const bucket = admin.storage().bucket();
+      const fileName = `${uuidv4()}-${file.originalname}`;
+      const fileUpload = bucket.file(fileName);
+  
+      await fileUpload.save(file.buffer, {
+        metadata: { contentType: file.mimetype },
+      });
+  
+      const [url] = await fileUpload.getSignedUrl({
+        action: 'read',
+        expires: '03-01-2500',
+      });
+  
+      const image = this.imageRepository.create({
+        url,
+        filename: fileName,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+  
+      await this.imageRepository.save(image);
+  
+      return image;
+    } catch (error) {
+      throw new Error(`Error uploading image: ${error.message}`);
+    }
   }
 
   async getImages(): Promise<Image[]> {
@@ -49,10 +47,27 @@ export class ImageService {
   }
 
   async getImageById(id: number): Promise<Image> {
+    if (!Number.isInteger(id)) {
+      throw new Error('Invalid ID. ID must be a number.');
+    }
     return this.imageRepository.findOneBy({ id });
   }
 
   async deleteImage(id: number): Promise<void> {
-    await this.imageRepository.delete(id);
+    const image = await this.getImageById(id);
+    if (image) {
+      try {
+        const fileName = image.url.split('/').pop().split('?')[0];
+        const file = admin.storage().bucket().file(fileName);
+  
+        await file.delete();
+  
+        await this.imageRepository.delete(id);
+      } catch (error) {
+        throw new Error(`Error deleting image: ${error.message}`);
+      }
+    } else {
+      throw new Error('Image not found');
+    }
   }
 }

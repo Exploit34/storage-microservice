@@ -1,19 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('image')
 export class Image {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   filename: String;
 
-  @Column()
+  @Column({ nullable: false })
   url: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ name: 'createdAt' })
   createdAt: Date;
 
-  @Column()
+  @Column({ name: 'updatedAt' })
   updatedAt: Date;
 }
