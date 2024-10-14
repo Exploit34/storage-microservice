@@ -5,13 +5,16 @@ export class Image {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
-  filename: String;
+  @Column()
+  filename: string;
 
-  @Column({ nullable: false })
+  @Column()
+  originalname: string;
+
+  @Column()
   url: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column()
   description: string;
 
   @Column({ name: 'createdAt' })

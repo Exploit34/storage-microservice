@@ -1,6 +1,8 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateImageDto {
+  @IsString()
   @IsNotEmpty()
-  image: Express.Multer.File;
+  title: string;
+  description: string;
 }
