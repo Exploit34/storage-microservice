@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin';
 import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 export const firebaseSdk = async () => {
